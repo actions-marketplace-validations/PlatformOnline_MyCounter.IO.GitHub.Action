@@ -57,7 +57,10 @@ jobs:
         id: test-action
         uses: ./
         with:
-          milliseconds: 2000
+          apikey: ${{ secrets.MYCOUNTER_IO_DEFAULT_TOKEN }}
+          workspace: default
+          counter: default
+          action: get
 
       - name: Print Output
         id: output
