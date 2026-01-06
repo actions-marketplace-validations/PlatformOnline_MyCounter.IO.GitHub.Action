@@ -101,4 +101,4 @@ __tests__/runner/*
 .idea
 *.code-workspace
 
-dist/
+dist/*
