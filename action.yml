@@ -20,7 +20,7 @@ inputs:
     required: true
     default: ''
   action:
-    description: 'Action to perform: get, increment, decrement'
+    description: 'Action to perform: get, increment, decrement, set'
     required: true
     default: ''
   value:

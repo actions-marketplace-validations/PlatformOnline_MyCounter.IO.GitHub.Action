@@ -2,20 +2,61 @@ import * as core from '@actions/core'
 
 export async function run(): Promise<void> {
   try {
-    const apikey = core.getInput('apikey', { required: true })
-    const workspace = core.getInput('workspace', { required: true })
-    const counter = core.getInput('counter', { required: true })
-    const action = core.getInput('action', { required: true })
+    const apikey = core.getInput('apikey', {
+      required: true,
+      trimWhitespace: true
+    })
+    const workspace = core.getInput('workspace', {
+      required: true,
+      trimWhitespace: true
+    })
+    const counter = core.getInput('counter', {
+      required: true,
+      trimWhitespace: true
+    })
+    const action = core.getInput('action', {
+      required: true,
+      trimWhitespace: true
+    })
+    const value = core.getInput('value', {
+      required: false,
+      trimWhitespace: true
+    })
 
     core.debug(`API Key: ${apikey}`)
     core.debug(`Workspace: ${workspace}`)
     core.debug(`Counter: ${counter}`)
     core.debug(`Action: ${action}`)
+    core.debug(`Value: ${value}`)
 
+    let sendValue =
+      value && !isNaN(parseInt(value)) ? parseInt(value) : undefined
+
+    if (sendValue === undefined) {
+      core.debug(
+        `No valid value was provided; the default value for this operation will be 1.`
+      )
+      sendValue = 1
+    }
+
+    let processAction = action.toLowerCase()
+    let processMethod = 'GET'
     switch (action) {
+      case 'get':
+        processAction = ''
+        processMethod = 'GET'
+        break
       case 'increment':
+        processAction = '/increment'
+        processMethod = 'POST'
+        break
       case 'decrement':
+        processAction = '/decrement'
+        processMethod = 'POST'
+        break
       case 'set':
+        processAction = '/set'
+        processMethod = 'POST'
         break
       default:
         core.setFailed(
@@ -25,14 +66,17 @@ export async function run(): Promise<void> {
     }
 
     const response = await fetch(
-      `https://api.mycounter.io/${workspace}/counter/${counter}/${action}`,
+      `https://api.mycounter.io/${workspace}/counter/${counter}${processAction}`,
       {
-        method: 'POST',
+        method: processMethod,
         headers: {
           'Content-Type': 'application/json',
           'x-api-key': `${apikey}`
         },
-        body: JSON.stringify({ action })
+        body:
+          processMethod == 'GET'
+            ? undefined
+            : JSON.stringify({ value: sendValue })
       }
     )
 
